@@ -1,0 +1,6 @@
+beautifulsoup4>=4.12.0
+html2text>=2020.1.16
+
+# Pandoc necesita instalación manual:
+# sudo apt-get install pandoc  # Para Linux
+# brew install pandoc         # Para macOS
