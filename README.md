@@ -1,11 +1,15 @@
 # Gemini2MD
 
-Tool to convert Gemini conversations to Markdown/HTML
+Conversor de chats Gemini (Google) a Markdown, preservando formato y estructura.  
+*(Gemini chat to Markdown converter, preserving formatting and structure)*
 
-## Features
-- Converts Gemini chats to well-formatted Markdown
-- Optional HTML output
-- Preserves conversation structure
+## Características principales / Features
+- Convierte chats Gemini a Markdown bien formateado  
+  *Converts Gemini chats to well-formatted Markdown*
+- Opción de salida HTML  
+  *Optional HTML output*
+- Preserva la estructura de la conversación  
+  *Preserves conversation structure*
 
 ## Installation
 ```bash
@@ -59,14 +63,14 @@ Los archivos incluidos en `example/` son muestras sintéticas. Al usar tus propi
 2. Considera usar el modo incógnito al exportar
 3. El script no filtra automáticamente datos sensibles
 
-## Development
+## Desarrollo
 
-This project uses Poetry for dependency management. To set up:
+Este proyecto usa Poetry para gestión de dependencias. Para configurar:
 
 ```bash
 poetry install
-poetry run python main.py --help  # Test installation
+poetry run python main.py --help  # Probar instalación
 ```
 
-## License
+## Licencia
 MIT
