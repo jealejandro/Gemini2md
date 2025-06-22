@@ -41,17 +41,33 @@ def html_to_markdown_basic(element):
         href = element.get('href', '')
         text = html_to_markdown_basic(element.contents)
         return f'[{text}]({href})'
-    elif element.name == 'code':
-        if element.find_parent('pre'): # Part of a code block
-            return element.get_text(strip=False)
-        else: # Inline code
-            return '`' + element.get_text(strip=True) + '`'
     elif element.name == 'pre':
         code_tag = element.find('code')
         if code_tag:
-            return '```\n' + code_tag.get_text(strip=False) + '\n```\n'
+            # Obtener el lenguaje del código si está especificado
+            language = ''
+            for cls in code_tag.get('class', []):
+                if cls.startswith('language-'):
+                    language = cls[len('language-'):]
+                    break
+            
+            code_content = code_tag.get_text(strip=False)
+            # Normalizar espacios y mantener indentación
+            code_content = '\n'.join(line.rstrip() for line in code_content.splitlines())
+            return f'```{language}\n{code_content}\n```\n\n'
         else:
-            return element.get_text(strip=False) + '\n'
+            # Si es un pre sin code, tratarlo como bloque de código sin lenguaje especificado
+            code_content = element.get_text(strip=False)
+            code_content = '\n'.join(line.rstrip() for line in code_content.splitlines())
+            return f'```\n{code_content}\n```\n\n'
+    elif element.name == 'code':
+        if element.find_parent('pre'):  # Ya manejado por el caso 'pre'
+            return element.get_text(strip=False)
+        else:  # Código inline
+            code_text = element.get_text(strip=True)
+            # Escapar caracteres especiales
+            code_text = code_text.replace('`', '\`')
+            return f'`{code_text}`'
     elif element.name == 'br':
         return '\n'
     elif element.contents:
@@ -462,15 +478,19 @@ def process_conversations_folder(input_dir):
         print(f"⚠️ Error procesando directorio: {str(e)}")
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert Gemini SingleFile HTML to Markdown')
-    parser.add_argument('input_dir', nargs='?', default='input', help='Input directory (default: input/)')
+    parser = argparse.ArgumentParser(description='Convert Gemini HTML conversations to Markdown')
+    parser.add_argument('input_path', help='Path to HTML file or directory containing HTML files')
     args = parser.parse_args()
 
-    # Crear carpeta si no existe
-    os.makedirs(args.input_dir, exist_ok=True)
-    
-    print(f"🔍 Buscando conversaciones en: {args.input_dir}")
-    process_conversations_folder(args.input_dir)
+    if os.path.isfile(args.input_path):
+        # Es un archivo, procesarlo directamente
+        extract_conversation_targeted(args.input_path)
+    elif os.path.isdir(args.input_path):
+        # Es un directorio, procesar todos los archivos
+        process_conversations_folder(args.input_path)
+    else:
+        print(f"Error: Path '{args.input_path}' does not exist or is not a file/directory")
+        return 1
 
 if __name__ == "__main__":
     main()
