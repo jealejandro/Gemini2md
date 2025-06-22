@@ -1,6 +1,7 @@
 import os
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, NavigableString, Tag
 import re
+from markdown_enhancer import EnhancedMarkdownConverter
 from datetime import datetime
 import subprocess
 import argparse
@@ -226,13 +227,16 @@ def extract_gemini_conversation_singlepage(html_file):
 
         if element.name == 'div' and element.has_attr('id') and element['id'].startswith('model-response-message-contentr_'):
             speaker = 'Gemini'
-            # Pass the entire container to html_to_markdown_basic
-            content = html_to_markdown_basic(element)
+            # Pass the entire container to the new converter
+            converter = EnhancedMarkdownConverter()
+            # We need to pass the HTML string of the element
+            content = converter.convert(element.prettify())
         elif element.name == 'p' and 'query-text-line' in element.get('class', []):
             speaker = 'Tú'
-            content = html_to_markdown_basic(element)
+            converter = EnhancedMarkdownConverter()
+            content = converter.convert(element.prettify())
 
-        if speaker and content.strip():
+        if speaker and content and content.strip():
             message_elements_with_speaker.append({
                 'speaker': speaker,
                 'content': content,
